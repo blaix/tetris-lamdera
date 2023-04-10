@@ -20,13 +20,13 @@ app =
         , onUrlChange = UrlChanged
         , update = update
         , updateFromBackend = updateFromBackend
-        , subscriptions = \m -> Sub.none
+        , subscriptions = \_ -> Sub.none
         , view = view
         }
 
 
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
-init url key =
+init _ key =
     ( { key = key
       , message = "Welcome to Lamdera! You're looking at the auto-generated base implementation. Check out src/Frontend.elm to start coding!"
       }
@@ -49,7 +49,7 @@ update msg model =
                     , Nav.load url
                     )
 
-        UrlChanged url ->
+        UrlChanged _ ->
             ( model, Cmd.none )
 
         NoOpFrontendMsg ->
