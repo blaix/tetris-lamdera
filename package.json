@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "postinstall": "npx elm-tooling install"
+  },
+  "dependencies": {
+    "elm-tooling": "^1.13.1"
+  }
+}
