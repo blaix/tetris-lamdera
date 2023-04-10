@@ -8,6 +8,8 @@ import Url exposing (Url)
 type alias FrontendModel =
     { key : Key
     , playArea : PlayArea
+    , block : Block
+    , frameDelta : Float
     }
 
 
@@ -19,7 +21,7 @@ type alias BackendModel =
 type FrontendMsg
     = UrlClicked UrlRequest
     | UrlChanged Url
-    | NoOpFrontendMsg
+    | Tick Float
 
 
 type ToBackend
@@ -37,4 +39,12 @@ type ToFrontend
 type alias PlayArea =
     { width : Int
     , height : Int
+    }
+
+
+type alias Block =
+    { width : Int
+    , height : Int
+    , x : Int
+    , y : Int
     }

@@ -1,6 +1,7 @@
 module Frontend exposing (..)
 
 import Browser exposing (UrlRequest(..))
+import Browser.Events as Events
 import Browser.Navigation as Nav
 import Element as E
 import Element.Background as Bg
@@ -21,7 +22,7 @@ app =
         , onUrlChange = UrlChanged
         , update = update
         , updateFromBackend = updateFromBackend
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         , view = view
         }
 
@@ -29,7 +30,9 @@ app =
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init _ key =
     ( { key = key
-      , playArea = { width = 800, height = 1000 }
+      , playArea = { width = 800, height = 1004 } -- height is multiple of block height + borders
+      , block = { width = 150, height = 20, x = 200, y = 0 }
+      , frameDelta = 0
       }
     , Cmd.none
     )
@@ -53,8 +56,41 @@ update msg model =
         UrlChanged _ ->
             ( model, Cmd.none )
 
-        NoOpFrontendMsg ->
-            ( model, Cmd.none )
+        Tick delta ->
+            let
+                frameDelta =
+                    model.frameDelta + delta
+
+                -- Lower block every 1/2 second
+                ( newFrameDelta, newBlock ) =
+                    if frameDelta > 500.0 then
+                        ( 0, lowerBlock model )
+
+                    else
+                        ( frameDelta, model.block )
+            in
+            ( { model | frameDelta = newFrameDelta, block = newBlock }
+            , Cmd.none
+            )
+
+
+lowerBlock : Model -> Block
+lowerBlock model =
+    let
+        block =
+            model.block
+
+        lowerY =
+            block.y + block.height
+
+        newY =
+            if lowerY < model.playArea.height - (borderWidth * 2) then
+                lowerY
+
+            else
+                block.y
+    in
+    { block | y = newY }
 
 
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
@@ -62,6 +98,11 @@ updateFromBackend msg model =
     case msg of
         NoOpToFrontend ->
             ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub FrontendMsg
+subscriptions _ =
+    Events.onAnimationFrameDelta Tick
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -84,9 +125,30 @@ viewPlayArea model =
         , E.centerY
         , Bg.color gray
         , Border.color black
-        , Border.width 2
+        , Border.width borderWidth
         ]
-        (E.text "play area")
+        (viewBlock model)
+
+
+viewBlock : Model -> E.Element FrontendMsg
+viewBlock model =
+    let
+        block =
+            model.block
+    in
+    E.el
+        [ E.width (E.px block.width)
+        , E.height (E.px block.height)
+        , Bg.color purple
+        , E.moveRight (toFloat block.x)
+        , E.moveDown (toFloat block.y)
+        ]
+        (E.text " ")
+
+
+borderWidth : Int
+borderWidth =
+    2
 
 
 gray : E.Color
@@ -97,3 +159,8 @@ gray =
 black : E.Color
 black =
     E.rgb255 0 0 0
+
+
+purple : E.Color
+purple =
+    E.rgb255 128 0 128
