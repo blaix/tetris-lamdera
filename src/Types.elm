@@ -7,7 +7,7 @@ import Url exposing (Url)
 
 type alias FrontendModel =
     { key : Key
-    , message : String
+    , playArea : PlayArea
     }
 
 
@@ -32,3 +32,9 @@ type BackendMsg
 
 type ToFrontend
     = NoOpToFrontend
+
+
+type alias PlayArea =
+    { width : Int
+    , height : Int
+    }

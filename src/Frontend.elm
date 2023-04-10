@@ -3,6 +3,8 @@ module Frontend exposing (..)
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
 import Element as E
+import Element.Background as Bg
+import Element.Border as Border
 import Lamdera
 import Types exposing (..)
 import Url
@@ -27,7 +29,7 @@ app =
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init _ key =
     ( { key = key
-      , message = "Welcome to Lamdera! You're looking at the auto-generated base implementation. Check out src/Frontend.elm to start coding!"
+      , playArea = { width = 800, height = 1000 }
       }
     , Cmd.none
     )
@@ -63,11 +65,35 @@ updateFromBackend msg model =
 
 
 view : Model -> Browser.Document FrontendMsg
-view _ =
+view model =
     { title = ""
     , body =
-        [ E.layout [] <|
-            E.column []
-                [ E.text "Hello" ]
+        [ E.layout [ E.padding 20, E.width E.fill, E.height E.fill ] <|
+            E.column [ E.width E.fill, E.height E.fill ]
+                [ viewPlayArea model ]
         ]
     }
+
+
+viewPlayArea : Model -> E.Element FrontendMsg
+viewPlayArea model =
+    E.el
+        [ E.width (E.px model.playArea.width)
+        , E.height (E.px model.playArea.height)
+        , E.centerX
+        , E.centerY
+        , Bg.color gray
+        , Border.color black
+        , Border.width 2
+        ]
+        (E.text "play area")
+
+
+gray : E.Color
+gray =
+    E.rgb255 200 200 200
+
+
+black : E.Color
+black =
+    E.rgb255 0 0 0
